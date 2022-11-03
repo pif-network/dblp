@@ -4,21 +4,25 @@ import kotlinx.coroutines.delay
 import space.jetbrains.api.runtime.helpers.commandArguments
 import space.jetbrains.api.runtime.helpers.message
 import space.jetbrains.api.runtime.types.*
+import kotlin.reflect.KSuspendFunction1
 
-suspend fun runRemindCommand(payload: MessagePayload) {
+suspend fun runRemindCommand(payload:MessagePayload?,sendMessage: KSuspendFunction1<ChatMessage, Unit>) {
     val remindMeArgs = getArgs(payload) ?: run {
-        sendMessage(payload.userId, helpMessage())
+        sendMessage(helpMessage())
         return
     }
 
-    remindAfterDelay(payload.userId, remindMeArgs)
+    remindAfterDelay(remindMeArgs, sendMessage)
 }
 
-private suspend fun remindAfterDelay(userId: String, remindMeArgs: RemindMeArgs) {
-    sendMessage(userId, acceptRemindMessage(remindMeArgs))
+private suspend fun remindAfterDelay(
+    remindMeArgs: RemindMeArgs,
+    sendMessage: KSuspendFunction1<ChatMessage, Unit>
+) {
+    sendMessage(acceptRemindMessage(remindMeArgs))
 
     delay(remindMeArgs.delayMs)
-    sendMessage(userId, remindMessage(remindMeArgs))
+    sendMessage(remindMessage(remindMeArgs))
 }
 
 private fun acceptRemindMessage(remindMeArgs: RemindMeArgs): ChatMessage {
@@ -53,8 +57,8 @@ private fun remindMessage(remindMeArgs: RemindMeArgs): ChatMessage {
     }
 }
 
-private fun getArgs(payload: MessagePayload): RemindMeArgs? {
-    val args = payload.commandArguments() ?: return null
+private fun getArgs(payload: MessagePayload?): RemindMeArgs? {
+    val args = payload?.commandArguments() ?: return null
     val delayMs = args.substringBefore(" ").toLongOrNull()?.times(1000) ?: return null
     val reminderText = args.substringAfter(" ").trimStart().takeIf { it.isNotEmpty() } ?: return null
     return RemindMeArgs(delayMs, reminderText)

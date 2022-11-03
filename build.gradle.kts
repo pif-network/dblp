@@ -19,7 +19,7 @@ group = "org.dblp"
 version = "0.0.1"
 
 application {
-    mainClass.set("org.dblp.ApplicationKt")
+    mainClass.set("org.dblp.Application")
 
 //    val isDevelopment: Boolean = project.ext.has("development")
 //    applicationDefaultJvmArgs = listOf("-Dio.ktor.development=$isDevelopment")
@@ -40,6 +40,8 @@ dependencies {
     implementation("org.jetbrains:space-sdk-jvm:$space_sdk_version")
     implementation("io.ktor:ktor-client-core:$ktor_version")
     implementation("io.ktor:ktor-client-cio:$ktor_version")
+    implementation("io.ktor:ktor-server-double-receive:$ktor_version")
+    implementation("io.ktor:ktor-server-double-receive-jvm:2.0.3")
     testImplementation("io.ktor:ktor-server-tests-jvm:2.0.3")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:1.7.10")
 

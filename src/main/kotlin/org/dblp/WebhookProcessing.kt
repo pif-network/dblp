@@ -15,9 +15,8 @@ suspend fun ProcessingScope.processWebhookEvent(payload: WebhookRequestPayload) 
     val client = clientWithClientCredentials()
     when (val event = payload.payload) {
         is IssueWebhookEvent -> {
-//            if (event.issue.status.resolved)
-//                client.sendMessage(event.member.id, "hi")
-                log.info("Issue ${event.issue.id} was created")
+            if (event.issue.status.resolved)
+                client.sendMessage(event.issue.id, helpMessage())
         }
 
 //        is TeamMembershipEvent -> {
@@ -44,7 +43,7 @@ suspend fun ProcessingScope.processWebhookEvent(payload: WebhookRequestPayload) 
     }
 }
 
-private suspend fun SpaceClient.sendMessage(userId: String, message: ChatMessage) {
+suspend fun SpaceClient.sendMessage(userId: String, message: ChatMessage) {
     chats.messages.sendMessage(
         channel = ChannelIdentifier.Profile(ProfileIdentifier.Id(userId)),
         content = message,

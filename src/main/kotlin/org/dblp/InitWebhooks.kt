@@ -22,9 +22,9 @@ suspend fun ProcessingScope.setupWebhooks() {
     spaceClient.applications.webhooks.subscriptions.createSubscription(
         application = ApplicationIdentifier.Me,
         webhookId = webhook.id,
-        name = "Issue created",
+        name = "Issue watcher",
         subscription = CustomGenericSubscriptionIn(
-            subjectCode = "Created",
+            subjectCode = "Issue",
             filters = emptyList(),
             eventTypeCodes = listOf("Issue.Created"),
         )
@@ -35,9 +35,9 @@ suspend fun ProcessingScope.setupWebhooks() {
         webhookId = webhook.id,
         name = "Issue updated",
         subscription = CustomGenericSubscriptionIn(
-            subjectCode = "Updated",
+            subjectCode = "Issue",
             filters = emptyList(),
-            eventTypeCodes = listOf("Issue.Updated"),
+            eventTypeCodes = listOf("Issue.StatusUpdated"),
         )
     )
 }
@@ -48,6 +48,6 @@ suspend fun ProcessingScope.requestPermissions() {
     spaceClient.applications.authorizations.authorizedRights.requestRights(
         application = ApplicationIdentifier.Me,
         contextIdentifier = GlobalPermissionContextIdentifier,
-        listOf("Project.Issues.View", "Team.View")
+        listOf("Project.Issues.View")
     )
 }
