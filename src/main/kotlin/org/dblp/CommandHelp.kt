@@ -24,3 +24,20 @@ fun helpMessage(): ChatMessage {
         }
     }
 }
+
+fun helpMessageError(): ChatMessage {
+    return message {
+        MessageOutline(
+            icon = ApiIcon("checkbox-checked"),
+            text = "Error"
+        )
+        section {
+            text("Error", MessageStyle.ERROR)
+            fields {
+                supportedCommands.forEach {
+                    field(it.name, it.info)
+                }
+            }
+        }
+    }
+}

@@ -15,8 +15,15 @@ suspend fun ProcessingScope.processWebhookEvent(payload: WebhookRequestPayload) 
     val client = clientWithClientCredentials()
     when (val event = payload.payload) {
         is IssueWebhookEvent -> {
-            if (event.issue.status.resolved)
-                client.sendMessage(event.issue.id, helpMessage())
+            val userId = getWatcherUserId(event.issue.id)
+            if (event.status?.old?.id != event.status?.new?.id && userId != null) {
+                val watcherAppInstance = getAppInstanceFromClientId(payload.clientId)
+                val watcherClient = createSpaceClientFromAppInstance(watcherAppInstance!!)
+                watcherClient.sendMessage(
+                    userId,
+                    ChatMessage.Text("Issue ${event.issue.id} status changed from ${event.status?.old?.name} to ${event.status?.new?.name}")
+                )
+            } else client.sendMessage("3twg7J3vc1ku", helpMessageError())
         }
 
 //        is TeamMembershipEvent -> {

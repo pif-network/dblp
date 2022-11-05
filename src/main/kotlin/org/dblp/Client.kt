@@ -1,13 +1,13 @@
 package org.dblp
 
+import org.dblp.db.AppInstallation
+import org.dblp.db.IssueRegistry
+import org.jetbrains.exposed.sql.select
+import org.jetbrains.exposed.sql.transactions.transaction
 import space.jetbrains.api.runtime.SpaceAppInstance
 import space.jetbrains.api.runtime.SpaceAuth
 import space.jetbrains.api.runtime.SpaceClient
 import space.jetbrains.api.runtime.ktorClientForSpace
-import space.jetbrains.api.runtime.resources.chats
-import space.jetbrains.api.runtime.types.ChannelIdentifier
-import space.jetbrains.api.runtime.types.ChatMessage
-import space.jetbrains.api.runtime.types.ProfileIdentifier
 
 //val spaceAppInstance = SpaceAppInstance(
 //    /**
@@ -25,7 +25,6 @@ import space.jetbrains.api.runtime.types.ProfileIdentifier
 //    spaceServerUrl = config.getString("space.serverUrl"),
 //)
 
-val spaceHttpClient = ktorClientForSpace()
 
 /**
  * Space Client used to call API methods in Space.
@@ -35,6 +34,7 @@ val spaceHttpClient = ktorClientForSpace()
  */
 //val spaceClient =
 //    SpaceClient(ktorClient = spaceHttpClient, appInstance = spaceAppInstance, auth = SpaceAuth.ClientCredentials())
+val spaceHttpClient = ktorClientForSpace()
 
 /**
  * Call API method in Space to send a message to the user.
@@ -45,3 +45,30 @@ val spaceHttpClient = ktorClientForSpace()
 //        content = message
 //    )
 //}
+
+fun createSpaceClientFromAppInstance(appInstance: SpaceAppInstance): SpaceClient {
+    val spaceHttpClient = ktorClientForSpace()
+    return SpaceClient(ktorClient = spaceHttpClient, appInstance = appInstance, auth = SpaceAuth.ClientCredentials())
+}
+
+fun getAppInstanceFromClientId(clientId: String): SpaceAppInstance? {
+    return transaction {
+        AppInstallation.select { AppInstallation.clientId.eq(clientId) }
+            .map {
+                SpaceAppInstance(
+                    it[AppInstallation.clientId],
+                    it[AppInstallation.clientSecret],
+                    it[AppInstallation.serverUrl],
+                )
+            }
+            .firstOrNull()
+    }
+}
+
+fun getWatcherUserId(issueId: String): String? {
+    return transaction {
+        IssueRegistry.select { IssueRegistry.issueId.eq(issueId) }
+            .map { it[IssueRegistry.issuerId] }
+            .firstOrNull()
+    }
+}
