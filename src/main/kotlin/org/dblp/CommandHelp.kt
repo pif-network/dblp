@@ -12,7 +12,7 @@ fun helpMessage(): ChatMessage {
     return message {
         MessageOutline(
             icon = ApiIcon("checkbox-checked"),
-            text = "Remind me bot help"
+            text = "Issue watcher - help"
         )
         section {
             text("List of available commands", MessageStyle.PRIMARY)
@@ -29,7 +29,7 @@ fun helpMessageError(): ChatMessage {
     return message {
         MessageOutline(
             icon = ApiIcon("checkbox-checked"),
-            text = "Error"
+            text = "Sorry, I don't understand you."
         )
         section {
             text("Error", MessageStyle.ERROR)
