@@ -19,6 +19,6 @@ suspend fun ProcessingScope.processCommand(payload: MessagePayload) {
     if (command == null) {
         runHelpCommand(::sendMessage)
     } else {
-        command.run(payload, ::sendMessage) 
+        command.run(payload, ::sendMessage, client) 
     }
 }
