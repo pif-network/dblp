@@ -9,6 +9,7 @@ import space.jetbrains.api.runtime.helpers.message
 import space.jetbrains.api.runtime.resources.projects
 import space.jetbrains.api.runtime.types.*
 import java.net.URI
+import java.time.LocalDate
 import kotlin.reflect.KSuspendFunction1
 
 suspend fun runWatchCommand(
@@ -21,8 +22,22 @@ suspend fun runWatchCommand(
         sendMessage(helpMessageError())
         return
     }
+    
+    if (watchArgs.issue == "check" && watchArgs.time == null) {
+        checkRegisteredIssueStatus()
+        return
+    }
 
-    val map = extractProjectKeyAndIssueIdFromUrl(watchArgs.issue)
+    val map: Map<String, String>
+
+    /* TODO: Deeper issue's link verification. */
+    try {
+        map = extractProjectKeyAndIssueIdFromUrl(watchArgs.issue)
+    } catch (e: IndexOutOfBoundsException) {
+        sendMessage(helpMessageError())
+        return
+    }
+    
     val projectKey = map["projectKey"]
     val issueNumber = map["issueNumber"]?.toInt()
 
@@ -36,7 +51,9 @@ suspend fun runWatchCommand(
         number = issueNumber
     ) {
         id()
-        status()
+        status {
+            name()
+        }
         title()
         channel {
             contact {
@@ -54,6 +71,7 @@ suspend fun runWatchCommand(
                 it[issueStatus] = theIssue.status.name
                 it[issueTitle] = theIssue.title
                 it[issueDefaultName] = theIssue.channel.contact.defaultName
+                it[expectedDaysToBeResolved] = LocalDate.now().plusDays(watchArgs.time!!.toLong())
                 it[this.projectKey] = projectKey
                 it[clientId] = payload.clientId
             }
@@ -92,12 +110,11 @@ private fun extractProjectKeyAndIssueIdFromUrl(url: String): Map<String, String>
 private fun getArgs(payload: MessagePayload): WatchArgs? {
     val args = payload.commandArguments() ?: return null
     val issue = args.substringBefore(" ")
-    val time =
-        args.substringAfter(" ").trimStart().takeIf { it.isNotEmpty() }?.toLongOrNull()?.times(1000) ?: return null
+    val time = args.substringAfter(" ").trimStart().takeIf { it.isNotEmpty() }?.toLongOrNull()?.times(1000)
     return WatchArgs(issue, time)
 }
 
 private class WatchArgs(
     val issue: String,
-    val time: Long,
+    val time: Long?,
 )
