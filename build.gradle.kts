@@ -70,6 +70,15 @@ tasks.withType<KotlinCompile> {
     kotlinOptions.jvmTarget = "1.8"
 }
 
+tasks.withType<Jar> {
+    manifest {
+        attributes["Main-Class"] = "org.dblp.ApplicationKt"
+    }
+    configurations["compileClasspath"].forEach { file: File ->
+        from(zipTree(file.absoluteFile))
+    }
+}
+
 tasks {
     val run by getting(JavaExec::class)
     dockerCompose.isRequiredBy(run)
