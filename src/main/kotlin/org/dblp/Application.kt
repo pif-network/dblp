@@ -56,7 +56,22 @@ fun main(): Unit = runBlocking {
 
     embeddedServer(Netty, port = 8080, watchPaths = listOf("classes")) {
         install(DoubleReceive)
-        initDbConnection()
+        
+        var retries = 5
+        
+        while (retries >= 0) {
+            try {
+                initDbConnection()
+                break
+            } catch (e: Exception) {
+                retries--
+                log.error("Failed to connect to database. Retrying in 5 seconds.")
+                launch {
+                    delay(5000)
+                }
+            }
+        }
+//        initDbConnection()
         configureRouting()
     }.start(wait = true)
 }
