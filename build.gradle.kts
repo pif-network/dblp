@@ -20,7 +20,7 @@ group = "org.dblp"
 version = "0.0.1"
 
 application {
-    mainClass.set("org.dblp.Application")
+    mainClass.set("org.dblp.ApplicationKt")
 
 //    val isDevelopment: Boolean = project.ext.has("development")
 //    applicationDefaultJvmArgs = listOf("-Dio.ktor.development=$isDevelopment")
@@ -71,6 +71,7 @@ tasks.withType<KotlinCompile> {
 }
 
 tasks.withType<Jar> {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     manifest {
         attributes["Main-Class"] = "org.dblp.ApplicationKt"
     }
