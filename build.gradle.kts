@@ -13,6 +13,7 @@ plugins {
     application
     kotlin("jvm") version "1.7.10"
     id("docker-compose")
+    id("io.ktor.plugin") version "2.1.3"
 }
 
 group = "org.dblp"
@@ -72,4 +73,33 @@ tasks.withType<KotlinCompile> {
 tasks {
     val run by getting(JavaExec::class)
     dockerCompose.isRequiredBy(run)
+}
+
+ktor {
+    fatJar {
+        archiveFileName.set("fat.jar")
+    }
+
+    docker {
+        jreVersion.set(io.ktor.plugin.features.JreVersion.JRE_17)
+        localImageName.set("iservice_dblp")
+        imageTag.set("0.0.1-alpha")
+        portMappings.set(
+            listOf(
+                io.ktor.plugin.features.DockerPortMapping(
+                    8080,
+                    8080,
+                    io.ktor.plugin.features.DockerPortMappingProtocol.TCP
+                )
+            )
+        )
+
+//        externalRegistry.set(
+//            io.ktor.plugin.features.DockerImageRegistry.dockerHub(
+//                appName = provider { "ktor-app" },
+//                username = providers.environmentVariable("DOCKER_HUB_USERNAME"),
+//                password = providers.environmentVariable("DOCKER_HUB_PASSWORD")
+//            )
+//        )
+    }
 }
