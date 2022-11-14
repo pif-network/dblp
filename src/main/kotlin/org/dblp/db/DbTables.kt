@@ -19,7 +19,7 @@ object IssueRegistry : Table("issue_registry") {
 
     val issueNumber = integer("issue_number")
     val issueTitle = varchar("issue_title", 256)
-    val issueDefaultName = varchar("issue_default_name", 256)
+    val issueLink = varchar("issue_link", 256)
     val issueStatus = varchar("issue_status", 36)
 
     val projectKey = varchar("project_key", 36)

@@ -42,55 +42,58 @@ suspend fun runWatchCommand(
 
     val map: Map<String, String>
 
-    /* TODO: Deeper issue's link verification. */
     try {
         map = extractProjectKeyAndIssueIdFromUrl(watchArgs.issue)
     } catch (e: IndexOutOfBoundsException) {
         sendMessage(helpMessageError())
         return
     }
-    
-    val projectKey = map["projectKey"]
-    val issueNumber = map["issueNumber"]?.toInt()
 
-    if (projectKey == null || issueNumber == null) {
-        sendMessage(helpMessageError())
-        return
-    }
+    /** Since the issue's link is valid, the following properties will never be null. **/
+    val projectKey = map["projectKey"]!!
+    val issueNumber = map["issueNumber"]?.toInt()!!
 
-    val theIssue = spaceClient.projects.planning.issues.getIssueByNumber(
-        project = ProjectIdentifier.Key(projectKey),
-        number = issueNumber
-    ) {
-        id()
-        status {
-            name()
+    try {
+
+        val theIssue = spaceClient.projects.planning.issues.getIssueByNumber(
+            project = ProjectIdentifier.Key(projectKey),
+            number = issueNumber
+        ) {
+            id()
+            status {
+                name()
+            }
+            title()
+//            channel {
+//                contact {
+//                    defaultName()
+//                }
+//            }
         }
-        title()
-        channel {
-            contact {
-                defaultName()
+
+        transaction {
+            with(IssueRegistry) {
+                replace {
+                    it[issueId] = theIssue.id
+                    it[issuerId] = payload.userId
+                    it[this.issueNumber] = issueNumber
+                    it[issueStatus] = theIssue.status.name
+                    it[issueTitle] = theIssue.title
+                    it[issueLink] = watchArgs.issue
+                    it[expectedDaysToBeResolved] = LocalDate.now().plusDays(watchArgs.time!!)
+                    it[this.projectKey] = projectKey
+                    it[clientId] = payload.clientId
+                }
             }
         }
-    }
 
-    transaction {
-        with(IssueRegistry) {
-            replace {
-                it[issueId] = theIssue.id
-                it[issuerId] = payload.userId
-                it[this.issueNumber] = issueNumber
-                it[issueStatus] = theIssue.status.name
-                it[issueTitle] = theIssue.title
-                it[issueDefaultName] = theIssue.channel.contact.defaultName
-                it[expectedDaysToBeResolved] = LocalDate.now().plusDays(watchArgs.time!!.toLong())
-                it[this.projectKey] = projectKey
-                it[clientId] = payload.clientId
-            }
-        }
-    }
+        sendMessage(acceptWatchMessage(theIssue.title, projectKey))
 
-    sendMessage(acceptWatchMessage(theIssue.title, projectKey))
+    } catch (e: Exception) {
+
+        sendMessage(ChatMessage.Text("Error: ${e.message}"))
+
+    }
 
 }
 
