@@ -22,9 +22,21 @@ suspend fun runWatchCommand(
         sendMessage(helpMessageError())
         return
     }
-    
+
+    /** Manually checking registered issues' status. **/
     if (watchArgs.issue == "check" && watchArgs.time == null) {
         checkRegisteredIssueStatus()
+        return
+    }
+
+    /**
+     * The following chunk verifies the issue's link existence and validity
+     * by checking the message's attachments. If the provided link does exist
+     * and is valid, an [UnfurlAttachment] will be included in the payload.
+     */
+    val attachments = payload.message.attachments
+    if (attachments == null) {
+        sendMessage(helpMessageError())
         return
     }
 
