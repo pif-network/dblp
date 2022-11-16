@@ -70,6 +70,17 @@ suspend fun runWatchCommand(
 //                }
 //            }
         }
+        
+        if (theIssue.status.name == "Done") {
+            sendMessage(message {
+                section { 
+                    text(
+                        content = "The issue is already closed. No need to watch it.",
+                    )
+                }
+            })
+            return
+        }
 
         transaction {
             with(IssueRegistry) {
