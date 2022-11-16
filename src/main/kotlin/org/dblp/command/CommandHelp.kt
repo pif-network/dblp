@@ -1,7 +1,10 @@
-package org.dblp
+package org.dblp.command
 
 import space.jetbrains.api.runtime.helpers.message
-import space.jetbrains.api.runtime.types.*
+import space.jetbrains.api.runtime.types.ApiIcon
+import space.jetbrains.api.runtime.types.ChatMessage
+import space.jetbrains.api.runtime.types.MessageOutline
+import space.jetbrains.api.runtime.types.MessageStyle
 import kotlin.reflect.KSuspendFunction1
 
 suspend fun runHelpCommand(sendMessage: KSuspendFunction1<ChatMessage, Unit>) {

@@ -1,5 +1,6 @@
-package org.dblp
+package org.dblp.command
 
+import org.dblp.checkRegisteredIssueStatus
 import org.dblp.db.IssueRegistry
 import org.jetbrains.exposed.sql.replace
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -70,10 +71,10 @@ suspend fun runWatchCommand(
 //                }
 //            }
         }
-        
+
         if (theIssue.status.name == "Done") {
             sendMessage(message {
-                section { 
+                section {
                     text(
                         content = "The issue is already closed. No need to watch it.",
                     )

@@ -1,4 +1,4 @@
-package org.dblp
+package org.dblp.command
 
 import space.jetbrains.api.runtime.SpaceClient
 import space.jetbrains.api.runtime.types.*

@@ -7,6 +7,7 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import kotlinx.coroutines.launch
+import org.dblp.command.getSupportedCommands
 import space.jetbrains.api.ExperimentalSpaceSdkApi
 import space.jetbrains.api.runtime.Space
 import space.jetbrains.api.runtime.helpers.*

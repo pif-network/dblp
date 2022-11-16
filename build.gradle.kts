@@ -42,7 +42,7 @@ dependencies {
     implementation("io.ktor:ktor-client-core:$ktor_version")
     implementation("io.ktor:ktor-client-cio:$ktor_version")
     implementation("io.ktor:ktor-server-double-receive:$ktor_version")
-    implementation("io.ktor:ktor-server-double-receive-jvm:2.0.3")
+    implementation("io.ktor:ktor-server-double-receive-jvm:2.1.3")
     testImplementation("io.ktor:ktor-server-tests-jvm:2.0.3")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:1.7.10")
 
