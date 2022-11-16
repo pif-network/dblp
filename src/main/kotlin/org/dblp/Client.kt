@@ -2,6 +2,7 @@ package org.dblp
 
 import org.dblp.db.AppInstallation
 import org.dblp.db.IssueRegistry
+import org.jetbrains.exposed.sql.andWhere
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
 import space.jetbrains.api.runtime.SpaceAppInstance
@@ -65,10 +66,11 @@ fun getAppInstanceFromClientId(clientId: String): SpaceAppInstance? {
     }
 }
 
-fun getWatcherUserId(issueId: String): String? {
+fun getWatchersUserId(issueId: String, clientId: String): List<String> {
     return transaction {
-        IssueRegistry.select { IssueRegistry.issueId.eq(issueId) }
+        IssueRegistry
+            .select { IssueRegistry.issueId.eq(issueId) }
+            .andWhere { IssueRegistry.clientId.eq(clientId) }
             .map { it[IssueRegistry.issuerId] }
-            .firstOrNull()
     }
 }
