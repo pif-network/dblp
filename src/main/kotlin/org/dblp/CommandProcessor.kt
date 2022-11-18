@@ -1,11 +1,12 @@
 package org.dblp
 
+import org.dblp.command.runHelpCommand
+import org.dblp.command.supportedCommands
 import space.jetbrains.api.ExperimentalSpaceSdkApi
 import space.jetbrains.api.runtime.helpers.ProcessingScope
 import space.jetbrains.api.runtime.helpers.command
 import space.jetbrains.api.runtime.types.ChatMessage
 import space.jetbrains.api.runtime.types.MessagePayload
-import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalSpaceSdkApi::class)
 suspend fun ProcessingScope.processCommand(payload: MessagePayload) {
@@ -19,6 +20,6 @@ suspend fun ProcessingScope.processCommand(payload: MessagePayload) {
     if (command == null) {
         runHelpCommand(::sendMessage)
     } else {
-        command.run(payload, ::sendMessage, client) 
+        command.run(payload, ::sendMessage, client)
     }
 }

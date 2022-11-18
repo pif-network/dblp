@@ -1,4 +1,4 @@
-package org.dblp
+package org.dblp.command
 
 import kotlinx.coroutines.delay
 import space.jetbrains.api.runtime.helpers.commandArguments

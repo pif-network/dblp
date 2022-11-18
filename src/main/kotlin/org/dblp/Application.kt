@@ -22,10 +22,10 @@ fun main(): Unit = runBlocking {
      * TODO: Inspect performance difference between this implementation and using an actual library.
      * @link: https://github.com/justwrote/kjob
      * */
-    
+
     var hasBeenInitialised = false
     val now = ZonedDateTime.now().plusSeconds(1)
-    
+
     launch {
 
         if (!hasBeenInitialised) {
@@ -55,24 +55,35 @@ fun main(): Unit = runBlocking {
     }
 
     embeddedServer(Netty, port = 8080, watchPaths = listOf("classes")) {
+
         install(DoubleReceive)
-        
+
         var retries = 5
-        
-        while (retries >= 0) {
-            try {
-                initDbConnection()
-                break
-            } catch (e: Exception) {
-                retries--
-                log.error("Failed to connect to database. Retrying in 5 seconds.")
-                launch {
+
+        launch {
+
+            while (retries >= 0) {
+
+                try {
+
+                    initDbConnection()
+                    break
+
+                } catch (e: Exception) {
+
+                    log.error("Failed to connect to database. Retrying in 5 seconds.")
                     delay(5000)
+
+                    retries--
+
                 }
+
             }
+
         }
-//        initDbConnection()
+
         configureRouting()
+
     }.start(wait = true)
 }
 

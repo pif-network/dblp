@@ -12,7 +12,7 @@ val postgresql_driver_version: String by project
 plugins {
     application
     kotlin("jvm") version "1.7.10"
-    id("docker-compose")
+//    id("docker-compose")
     id("io.ktor.plugin") version "2.1.3"
 }
 
@@ -42,7 +42,7 @@ dependencies {
     implementation("io.ktor:ktor-client-core:$ktor_version")
     implementation("io.ktor:ktor-client-cio:$ktor_version")
     implementation("io.ktor:ktor-server-double-receive:$ktor_version")
-    implementation("io.ktor:ktor-server-double-receive-jvm:2.0.3")
+    implementation("io.ktor:ktor-server-double-receive-jvm:2.1.3")
     testImplementation("io.ktor:ktor-server-tests-jvm:2.0.3")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:1.7.10")
 
@@ -56,11 +56,11 @@ dependencies {
     testImplementation(kotlin("test"))
 }
 
-dockerCompose {
-    projectName = "dblp"
-    removeContainers = false
-    removeVolumes = false
-}
+//dockerCompose {
+//    projectName = "dblp"
+//    removeContainers = false
+//    removeVolumes = false
+//}
 
 tasks.test {
     useJUnitPlatform()
@@ -80,10 +80,10 @@ tasks.withType<Jar> {
     }
 }
 
-tasks {
-    val run by getting(JavaExec::class)
-    dockerCompose.isRequiredBy(run)
-}
+//tasks {
+//    val run by getting(JavaExec::class)
+//    dockerCompose.isRequiredBy(run)
+//}
 
 ktor {
     fatJar {
