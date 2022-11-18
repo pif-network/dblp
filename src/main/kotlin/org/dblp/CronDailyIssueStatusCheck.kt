@@ -18,7 +18,10 @@ fun checkRegisteredIssueStatus() = runBlocking {
 
     val unresolvedIssues = transaction {
         IssueRegistry
-            .select { (IssueRegistry.issueStatus.eq("Open")) and (IssueRegistry.expectedDaysToBeResolved.eq(LocalDate.now())) }
+            .select {
+                (IssueRegistry.issueStatus.eq("Open")) and
+                (IssueRegistry.expectedDaysToBeResolved.eq(LocalDate.now()))
+            }
             .toList()
     }
 
@@ -41,6 +44,7 @@ fun checkRegisteredIssueStatus() = runBlocking {
         spaceInstances.forEach {
 
                 spaceInstance ->
+            
             val spaceClient = createSpaceClientFromAppInstance(spaceInstance)
 
             launch {

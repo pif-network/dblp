@@ -1,12 +1,11 @@
 package org.dblp.db
 
+import org.dblp.config
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.transaction
-import org.dblp.config
 
 fun initDbConnection() {
-    // see application.conf file in resources
     val host = config.getString("postgresql.host")
     val port = config.getString("postgresql.port")
     val user = config.getString("postgresql.user")

@@ -67,7 +67,7 @@ fun Application.configureRouting() {
                     }
 
                     is MessagePayload -> {
-                        /** Process webhook asynchronously, respond to Space immediately **/
+                        /** Process message asynchronously, respond to Space immediately **/
                         launch {
                             processCommand(payload)
                         }

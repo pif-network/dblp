@@ -3,7 +3,6 @@
 package org.dblp
 
 import org.dblp.db.IssueRegistry
-import org.jetbrains.exposed.sql.ResultRow
 import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -22,14 +21,16 @@ suspend fun ProcessingScope.processWebhookEvent(payload: WebhookRequestPayload) 
 
         is IssueWebhookEvent -> {
 
-            var theIssue: ResultRow? = null
+            val theIssue = transaction {
+                IssueRegistry.select { IssueRegistry.issueId.eq(event.issue.id) }.firstOrNull()
+            } ?: return
 
-            transaction {
-                theIssue = IssueRegistry.select { IssueRegistry.issueId.eq(event.issue.id) }.firstOrNull()
-            }
-
-            if (theIssue == null) return
-
+            /**
+             * The status name does not exist in the payload,
+             * so if the status changes, the issue has been resolved.
+             *
+             * Trust me.
+             */
             if (event.status?.new?.id != event.status?.old?.id) {
 
                 val watchersUserIds = getWatchersUserId(event.issue.id, payload.clientId)
@@ -41,7 +42,7 @@ suspend fun ProcessingScope.processWebhookEvent(payload: WebhookRequestPayload) 
                     client.sendMessage(
                         watchersUserId,
                         ChatMessage.Text(
-                            "Issue \"${theIssue!![IssueRegistry.issueTitle]}\" has been resolved. Removing it from watch list."
+                            "Issue \"${theIssue[IssueRegistry.issueTitle]}\" has been resolved. Removing it from watch list."
                         )
                     )
 

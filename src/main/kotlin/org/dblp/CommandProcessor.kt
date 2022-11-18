@@ -10,6 +10,7 @@ import space.jetbrains.api.runtime.types.MessagePayload
 
 @OptIn(ExperimentalSpaceSdkApi::class)
 suspend fun ProcessingScope.processCommand(payload: MessagePayload) {
+    
     val client = clientWithClientCredentials()
     suspend fun sendMessage(message: ChatMessage) {
         client.sendMessage(payload.userId, message)
@@ -17,9 +18,15 @@ suspend fun ProcessingScope.processCommand(payload: MessagePayload) {
 
     val commandName = payload.command()
     val command = supportedCommands.find { it.name == commandName }
+    
     if (command == null) {
+        
         runHelpCommand(::sendMessage)
+        
     } else {
+        
         command.run(payload, ::sendMessage, client)
+        
     }
+    
 }
