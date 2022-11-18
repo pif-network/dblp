@@ -60,23 +60,22 @@ fun main(): Unit = runBlocking {
 
         var retries = 5
 
-        launch {
 
-            while (retries >= 0) {
+        while (retries >= 0) {
 
-                try {
+            try {
 
-                    initDbConnection()
-                    break
+                initDbConnection()
+                break
 
-                } catch (e: Exception) {
+            } catch (e: Exception) {
 
-                    log.error("Failed to connect to database. Retrying in 5 seconds.")
+                log.error("Failed to connect to database. Retrying in 5 seconds.")
+                runBlocking {
                     delay(5000)
-
-                    retries--
-
                 }
+
+                retries--
 
             }
 
