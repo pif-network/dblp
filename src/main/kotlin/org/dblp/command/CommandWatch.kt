@@ -24,7 +24,7 @@ suspend fun runWatchCommand(
         return
     }
 
-    /** Manually checking registered issues' status. **/
+    /** Checking registered issues' status. **/
     if (watchArgs.issue == "check" && watchArgs.time == null) {
         checkRegisteredIssueStatus()
         return
@@ -41,18 +41,18 @@ suspend fun runWatchCommand(
         return
     }
 
-    val map: Map<String, String>
+    val issueUrlMap: Map<String, String>
 
     try {
-        map = extractProjectKeyAndIssueIdFromUrl(watchArgs.issue)
+        issueUrlMap = extractProjectKeyAndIssueIdFromUrl(watchArgs.issue)
     } catch (e: IndexOutOfBoundsException) {
         sendMessage(helpMessageError())
         return
     }
 
     /** Since the issue's link is valid, the following properties will never be null. **/
-    val projectKey = map["projectKey"]!!
-    val issueNumber = map["issueNumber"]?.toInt()!!
+    val projectKey = issueUrlMap["projectKey"]!!
+    val issueNumber = issueUrlMap["issueNumber"]?.toInt()!!
 
     try {
 
@@ -65,6 +65,7 @@ suspend fun runWatchCommand(
                 name()
             }
             title()
+            /** @see [SPACE-17854](https://youtrack.jetbrains.com/issue/SPACE-17854/Space-SDK-Cannot-access-fields-that-share-permission) **/
 //            channel {
 //                contact {
 //                    defaultName()
@@ -73,14 +74,10 @@ suspend fun runWatchCommand(
         }
 
         if (theIssue.status.name == "Done") {
-            sendMessage(message {
-                section {
-                    text(
-                        content = "The issue is already closed. No need to watch it.",
-                    )
-                }
-            })
+
+            sendMessage(ChatMessage.Text("The issue is already closed. No need to watch it."))
             return
+
         }
 
         transaction {

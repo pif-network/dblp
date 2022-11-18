@@ -51,15 +51,14 @@ fun Application.configureRouting() {
                     }
 
                     is WebhookRequestPayload -> {
-                        // process webhook asynchronously, respond to Space immediately
+                        /** Process webhook asynchronously, respond to Space immediately **/
                         launch {
                             processWebhookEvent(payload)
                         }
                     }
 
                     is ListCommandsPayload -> {
-
-                        // Space requests the list of supported commands
+                        /** Space requests the list of supported commands **/
                         call.respondText(
                             ObjectMapper().writeValueAsString(getSupportedCommands()),
                             ContentType.Application.Json
@@ -68,21 +67,10 @@ fun Application.configureRouting() {
                     }
 
                     is MessagePayload -> {
-
-                        // user sent a message to the application
-//                        val commandName = payload.command()
-//                        val command = supportedCommands.find { it.name == commandName }
-                        /* TODO: Write processing function for this payload */
+                        /** Process webhook asynchronously, respond to Space immediately **/
                         launch {
                             processCommand(payload)
                         }
-//                        if (command == null) {
-//                            runHelpCommand(payload)
-//                        } else {
-//                            launch { command.run(payload) }
-//                        }
-//                        call.respond(HttpStatusCode.OK, "")
-
                     }
 
                 }
