@@ -2,6 +2,7 @@ package org.dblp.command
 
 import org.dblp.checkRegisteredIssueStatus
 import org.dblp.db.IssueRegistry
+import org.dblp.log
 import org.jetbrains.exposed.sql.replace
 import org.jetbrains.exposed.sql.transactions.transaction
 import space.jetbrains.api.runtime.SpaceClient
@@ -26,8 +27,13 @@ suspend fun runWatchCommand(
 
     /** Checking registered issues' status. **/
     if (watchArgs.issue == "check" && watchArgs.time == null) {
-        checkRegisteredIssueStatus()
-        return
+        try {
+            checkRegisteredIssueStatus()
+            return
+        } catch (e: Exception) {
+            log.error(e.stackTraceToString())
+            return
+        }
     }
 
     /**
