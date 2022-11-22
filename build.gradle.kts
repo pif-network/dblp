@@ -36,6 +36,9 @@ dependencies {
     implementation("io.ktor:ktor-server-core-jvm:$ktor_version")
     implementation("io.ktor:ktor-server-netty-jvm:$ktor_version")
     implementation("ch.qos.logback:logback-classic:$logback_version")
+    implementation("io.github.microutils:kotlin-logging-jvm:3.0.2")
+    implementation("org.slf4j:slf4j-simple:2.0.3")
+    implementation("com.nimbusds:nimbus-jose-jwt:9.25.6")
 
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:$jackson_version")
     implementation("org.jetbrains:space-sdk-jvm:$space_sdk_version")
