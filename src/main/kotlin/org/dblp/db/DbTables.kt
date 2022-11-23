@@ -25,7 +25,7 @@ object IssueRegistry : Table("issue_registry") {
     val projectKey = varchar("project_key", 36)
 
     val expectedDaysToBeResolved = date("expected_days")
-    val iat = date("issued_at").default(LocalDate.now())
+    val iat = date("issued_at").clientDefault { LocalDate.now() }
 
     val clientId = varchar("client_id", 36)
 

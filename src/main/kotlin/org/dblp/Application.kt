@@ -60,12 +60,17 @@ fun main(): Unit = runBlocking {
 
         var retries = 5
 
-
         while (retries >= 0) {
+
+            val host = System.getenv("myhost").toString()
+            val user = System.getenv("myuser").toString()
+            val password = System.getenv("mypassword").toString()
+            val database = System.getenv("mydatabase").toString()
+            log.info("Connecting to database: $host, $user, $password, $database")
 
             try {
 
-                initDbConnection()
+                initDbConnection(host, user, password, database)
                 break
 
             } catch (e: Exception) {

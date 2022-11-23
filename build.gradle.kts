@@ -7,7 +7,7 @@ val space_sdk_version: String by project
 val jackson_version: String by project
 val exposed_version: String by project
 val hikari_version: String by project
-val postgresql_driver_version: String by project
+val mysql_driver_version: String by project
 
 plugins {
     application
@@ -54,7 +54,7 @@ dependencies {
     implementation("org.jetbrains.exposed:exposed-jdbc:$exposed_version")
     implementation("org.jetbrains.exposed:exposed-java-time:$exposed_version")
     implementation("com.zaxxer:HikariCP:$hikari_version")
-    implementation("org.postgresql:postgresql:$postgresql_driver_version")
+    implementation("mysql:mysql-connector-java:$mysql_driver_version")
 
     testImplementation(kotlin("test"))
 }
