@@ -1,16 +1,25 @@
 version: '3'
-
 services:
-  postgres:
+  
+  db:
     image: "postgres:12.2"
+    container_name: postgres
     ports:
       - "5432:5432"
     environment:
-      POSTGRES_USER: root
-      POSTGRES_PASSWORD: spaceEvents
-      POSTGRES_DB: spaceEvents
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: dblp 
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -d spaceEvents -U root"]
+      test: [ "CMD-SHELL", "pg_isready -d dblp -U postgres" ]
       interval: 5s
       timeout: 5s
       retries: 5
+
+#  service:
+#    image: iservice_dblp:0.0.1-alpha
+#    container_name: service_dblp
+#    ports:
+#      - "8080:8080"
+#    depends_on:
+#      - db
