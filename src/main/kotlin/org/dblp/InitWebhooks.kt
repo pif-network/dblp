@@ -48,6 +48,7 @@ suspend fun ProcessingScope.requestPermissions() {
     spaceClient.applications.authorizations.authorizedRights.requestRights(
         application = ApplicationIdentifier.Me,
         contextIdentifier = GlobalPermissionContextIdentifier,
-        listOf("Project.Issues.View")
+        /** @see [SPACE-17854](https://youtrack.jetbrains.com/issue/SPACE-17854/Space-SDK-Cannot-access-fields-that-share-permission) **/
+        listOf("Project.Issues.View", "Project.View")
     )
 }
