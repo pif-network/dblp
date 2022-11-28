@@ -3,6 +3,7 @@
 package org.dblp
 
 import org.dblp.db.IssueRegistry
+import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -21,10 +22,6 @@ suspend fun ProcessingScope.processWebhookEvent(payload: WebhookRequestPayload) 
 
         is IssueWebhookEvent -> {
 
-            val theIssue = transaction {
-                IssueRegistry.select { IssueRegistry.issueId.eq(event.issue.id) }.firstOrNull()
-            } ?: return
-
             /**
              * The status name does not exist in the payload,
              * so if the status changes, the issue has been resolved.
@@ -33,24 +30,35 @@ suspend fun ProcessingScope.processWebhookEvent(payload: WebhookRequestPayload) 
              */
             if (event.status?.new?.id != event.status?.old?.id) {
 
-                val watchersUserIds = getWatchersUserId(event.issue.id, payload.clientId)
+                val theIssues = transaction {
+                    IssueRegistry
+                        .select {
+                            (IssueRegistry.issueId.eq(event.issue.id)) and
+                                    (IssueRegistry.clientId.eq(payload.clientId))
+                        }
+                        .toList()
+                }
 
-                watchersUserIds.forEach {
+                if (theIssues.isNotEmpty()) {
 
-                        watchersUserId ->
+                    theIssues.forEach {
 
-                    client.sendMessage(
-                        watchersUserId,
-                        ChatMessage.Text(
-                            "Issue \"${theIssue[IssueRegistry.issueTitle]}\" has been resolved. Removing it from watch list."
+                            theIssue ->
+
+                        client.sendMessage(
+                            theIssue[IssueRegistry.issuerId],
+                            ChatMessage.Text(
+                                "Issue \"${theIssue[IssueRegistry.issueTitle]}\" has been resolved. Removing it from watch list."
+                            )
                         )
-                    )
 
-                }
+                    }
 
-                transaction {
-                    IssueRegistry.deleteWhere { IssueRegistry.issueId.eq(event.issue.id) }
-                }
+                    transaction {
+                        IssueRegistry.deleteWhere { IssueRegistry.issueId.eq(event.issue.id) }
+                    }
+
+                } 
 
             }
 
