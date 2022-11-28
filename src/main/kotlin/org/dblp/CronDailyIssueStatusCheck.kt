@@ -1,7 +1,5 @@
 package org.dblp
 
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import org.dblp.db.AppInstallation
 import org.dblp.db.IssueRegistry
 import org.jetbrains.exposed.sql.and
@@ -14,22 +12,26 @@ import space.jetbrains.api.runtime.types.ChatMessage
 import space.jetbrains.api.runtime.types.MessageOutline
 import java.time.LocalDate
 
-fun checkRegisteredIssueStatus() = runBlocking {
+suspend fun cronCheckRegisteredIssueStatus() {
 
     val unresolvedIssues = transaction {
         IssueRegistry
             .select {
                 (IssueRegistry.issueStatus.eq("Open")) and
-                (IssueRegistry.expectedDaysToBeResolved.eq(LocalDate.now()))
+                        (IssueRegistry.expectedDaysToBeResolved.eq(LocalDate.now()))
             }
             .toList()
+    }
+
+    if (unresolvedIssues.isEmpty()) {
+        return
     }
 
     unresolvedIssues.forEach {
 
             unresolvedIssue ->
 
-        val spaceInstances = transaction {
+        val spaceInstance = transaction {
             AppInstallation
                 .select { AppInstallation.clientId.eq(unresolvedIssue[IssueRegistry.clientId]) }
                 .map {
@@ -39,22 +41,15 @@ fun checkRegisteredIssueStatus() = runBlocking {
                         it[AppInstallation.serverUrl],
                     )
                 }
+                .first() // If there is an issue, there is an instance.
         }
 
-        spaceInstances.forEach {
+        val spaceClient = createSpaceClientFromAppInstance(spaceInstance)
 
-                spaceInstance ->
-            
-            val spaceClient = createSpaceClientFromAppInstance(spaceInstance)
-
-            launch {
-                spaceClient.sendMessage(
-                    unresolvedIssue[IssueRegistry.issuerId],
-                    notifyUnresolvedIssueMessage(unresolvedIssue[IssueRegistry.issueTitle])
-                )
-            }
-
-        }
+        spaceClient.sendMessage(
+            unresolvedIssue[IssueRegistry.issuerId],
+            notifyUnresolvedIssueMessage(unresolvedIssue[IssueRegistry.issueTitle])
+        )
 
     }
 
