@@ -153,7 +153,7 @@ private fun extractProjectKeyAndIssueIdFromUrl(url: String): Map<String, String>
 
 
 private fun getArgs(payload: MessagePayload): WatchArgs? {
-    val args = payload.commandArguments() ?: return null
+    val args = payload.commandArguments()?.trimEnd() ?: return null
     val issue = args.substringBefore(" ")
     val time = args.substringAfter(" ").trimStart().takeIf { it.isNotEmpty() }?.toLongOrNull()
     return WatchArgs(issue, time)
