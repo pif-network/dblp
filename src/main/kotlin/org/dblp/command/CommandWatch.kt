@@ -1,10 +1,15 @@
 package org.dblp.command
 
-import org.dblp.checkRegisteredIssueStatus
+import org.dblp.createSpaceClientFromAppInstance
+import org.dblp.db.AppInstallation
 import org.dblp.db.IssueRegistry
 import org.dblp.log
+import org.dblp.sendMessage
+import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.replace
+import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
+import space.jetbrains.api.runtime.SpaceAppInstance
 import space.jetbrains.api.runtime.SpaceClient
 import space.jetbrains.api.runtime.helpers.commandArguments
 import space.jetbrains.api.runtime.helpers.message
@@ -27,13 +32,23 @@ suspend fun runWatchCommand(
 
     /** Checking registered issues' status. **/
     if (watchArgs.issue == "check" && watchArgs.time == null) {
+
         try {
-            checkRegisteredIssueStatus()
+
+            sendMessage(ChatMessage.Text("Checking registered issues' status..."))
+            checkRegisteredIssueStatus(
+                sendMessage = sendMessage,
+                clientId = payload.clientId
+            )
             return
+
         } catch (e: Exception) {
+
             log.error(e.stackTraceToString())
             return
+
         }
+
     }
 
     /**
@@ -148,3 +163,54 @@ private class WatchArgs(
     val issue: String,
     val time: Long?,
 )
+
+private suspend fun checkRegisteredIssueStatus(
+    clientId: String,
+    sendMessage: KSuspendFunction1<ChatMessage, Unit>
+) {
+
+    val unresolvedIssues = transaction {
+        IssueRegistry
+            .select {
+                (IssueRegistry.clientId.eq(clientId)) and
+                        (IssueRegistry.issueStatus.eq("Open"))
+            }
+            .toList()
+    }
+
+    if (unresolvedIssues.isEmpty()) {
+        sendMessage(ChatMessage.Text("No issues to check."))
+        return
+    }
+
+    unresolvedIssues.forEach {
+
+            unresolvedIssue ->
+
+        val spaceInstance = transaction {
+            AppInstallation
+                .select { AppInstallation.clientId.eq(unresolvedIssue[IssueRegistry.clientId]) }
+                .map {
+                    SpaceAppInstance(
+                        it[AppInstallation.clientId],
+                        it[AppInstallation.clientSecret],
+                        it[AppInstallation.serverUrl],
+                    )
+                }
+                .first()
+        }
+
+        val spaceClient = createSpaceClientFromAppInstance(spaceInstance)
+
+        spaceClient.sendMessage(
+            unresolvedIssue[IssueRegistry.issuerId],
+            ChatMessage.Text(
+                "The issue \"${unresolvedIssue[IssueRegistry.issueTitle]}\" " +
+                        "in project \"${unresolvedIssue[IssueRegistry.projectKey]}\" " +
+                        "has not been resolved yet."
+            )
+        )
+
+    }
+
+}
