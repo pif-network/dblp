@@ -1,5 +1,6 @@
 package org.dblp.db
 
+import org.jetbrains.exposed.dao.id.UUIDTable
 import org.jetbrains.exposed.sql.Table
 import org.jetbrains.exposed.sql.javatime.date
 import java.time.LocalDate
@@ -12,8 +13,8 @@ object AppInstallation : Table("app_installation") {
     override val primaryKey = PrimaryKey(clientId)
 }
 
-object IssueRegistry : Table("issue_registry") {
-    val issueId = varchar("issue_id", 36).index(isUnique = true)
+object IssueRegistry : UUIDTable("issue_registry", "uuid") {
+    val issueId = varchar("issue_id", 36)
 
     val issuerId = varchar("issuer_id", 36)
 
@@ -28,6 +29,4 @@ object IssueRegistry : Table("issue_registry") {
     val iat = date("issued_at").clientDefault { LocalDate.now() }
 
     val clientId = varchar("client_id", 36)
-
-    override val primaryKey = PrimaryKey(issueId)
 }
