@@ -33,7 +33,9 @@ val supportedCommands = listOf(
 
     ApplicationCommand(
         "watch",
-        "Watch an issue, e.g. send \"watch https://the-shadows.jetbrains.space/p/dblp/issues/1\" to watch the issue",
+        "Params:\n" +
+                "* `issue_link`: use the link from the `Copy to clipboard` button on the issue page.\n" +
+                "* `time`: watching time, in day. Watch list will be checked daily for unresolved out-of-time issue(s)."
     ) { payload, sendMessage, spaceClient ->
         runWatchCommand(
             payload = payload,
