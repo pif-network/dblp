@@ -14,19 +14,16 @@ object AppInstallation : Table("app_installation") {
 }
 
 object IssueRegistry : UUIDTable("issue_registry", "uuid") {
-    val issueId = varchar("issue_id", 36)
-
     val issuerId = varchar("issuer_id", 36)
+    val clientId = varchar("client_id", 36)
 
-    val issueNumber = integer("issue_number")
+    val issueId = varchar("issue_id", 36)
+    val issueKey= varchar("issue_key", 36)
     val issueTitle = varchar("issue_title", 256)
-    val issueLink = varchar("issue_link", 256)
-    val issueStatus = varchar("issue_status", 36)
 
     val projectKey = varchar("project_key", 36)
 
-    val expectedDaysToBeResolved = date("expected_days")
+    @Suppress("unused")
     val iat = date("issued_at").clientDefault { LocalDate.now() }
-
-    val clientId = varchar("client_id", 36)
+    val expectedDateToBeResolved = date("expected_resolve_date")
 }

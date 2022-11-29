@@ -2,7 +2,6 @@ package org.dblp
 
 import org.dblp.db.AppInstallation
 import org.dblp.db.IssueRegistry
-import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
 import space.jetbrains.api.runtime.SpaceAppInstance
@@ -16,10 +15,7 @@ suspend fun cronCheckRegisteredIssueStatus() {
 
     val unresolvedIssues = transaction {
         IssueRegistry
-            .select {
-                (IssueRegistry.issueStatus.eq("Open")) and
-                        (IssueRegistry.expectedDaysToBeResolved.eq(LocalDate.now()))
-            }
+            .select { IssueRegistry.expectedDateToBeResolved.eq(LocalDate.now()) }
             .toList()
     }
 

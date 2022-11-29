@@ -5,7 +5,6 @@ import org.dblp.db.AppInstallation
 import org.dblp.db.IssueRegistry
 import org.dblp.log
 import org.dblp.sendMessage
-import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.replace
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -86,12 +85,11 @@ suspend fun runWatchCommand(
                 name()
             }
             title()
-            /** @see [SPACE-17854](https://youtrack.jetbrains.com/issue/SPACE-17854/Space-SDK-Cannot-access-fields-that-share-permission) **/
-//            channel {
-//                contact {
-//                    defaultName()
-//                }
-//            }
+            channel {
+                contact {
+                    defaultName()
+                }
+            }
         }
 
         if (theIssue.status.name == "Done") {
@@ -104,15 +102,13 @@ suspend fun runWatchCommand(
         transaction {
             with(IssueRegistry) {
                 replace {
-                    it[issueId] = theIssue.id
                     it[issuerId] = payload.userId
-                    it[this.issueNumber] = issueNumber
-                    it[issueStatus] = theIssue.status.name
-                    it[issueTitle] = theIssue.title
-                    it[issueLink] = watchArgs.issue
-                    it[expectedDaysToBeResolved] = LocalDate.now().plusDays(watchArgs.time!!)
-                    it[this.projectKey] = projectKey
                     it[clientId] = payload.clientId
+                    it[issueId] = theIssue.id
+                    it[issueKey] = theIssue.channel.contact.defaultName
+                    it[issueTitle] = theIssue.title
+                    it[this.projectKey] = projectKey
+                    it[expectedDateToBeResolved] = LocalDate.now().plusDays(watchArgs.time!!)
                 }
             }
         }
@@ -171,10 +167,7 @@ private suspend fun checkRegisteredIssueStatus(
 
     val unresolvedIssues = transaction {
         IssueRegistry
-            .select {
-                (IssueRegistry.clientId.eq(clientId)) and
-                        (IssueRegistry.issueStatus.eq("Open"))
-            }
+            .select { IssueRegistry.clientId.eq(clientId) }
             .toList()
     }
 
