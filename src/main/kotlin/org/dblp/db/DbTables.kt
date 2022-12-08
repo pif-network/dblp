@@ -26,4 +26,8 @@ object IssueRegistry : UUIDTable("issue_registry", "uuid") {
     @Suppress("unused")
     val iat = date("issued_at").clientDefault { LocalDate.now() }
     val expectedDateToBeResolved = date("expected_resolve_date")
+    
+    init {
+        uniqueIndex(issuerId, issueId)
+    }
 }
