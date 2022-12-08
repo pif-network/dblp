@@ -94,8 +94,8 @@ suspend fun runWatchCommand(
 
         if (theIssue.status.name == "Done") {
 
-            sendMessage(ChatMessage.Text("The issue is already closed. No need to watch it."))
-            return
+                    sendMessage(ChatMessage.Text("The issue ${theIssue.channel.contact.defaultName} is already closed. No need to watch it."))
+                    return
 
         }
 
@@ -113,7 +113,7 @@ suspend fun runWatchCommand(
             }
         }
 
-        sendMessage(acceptWatchMessage(theIssue.title, projectKey))
+                sendMessage(acceptWatchMessage(theIssue.channel.contact.defaultName, time))
 
     } catch (e: Exception) {
 
@@ -123,7 +123,11 @@ suspend fun runWatchCommand(
 
 }
 
-private fun acceptWatchMessage(issueTitle: String, projectKey: String): ChatMessage {
+    }
+
+}
+
+private fun acceptWatchMessage(issueDefaultName: String, watchTime: Long): ChatMessage {
     return message {
         outline(
             MessageOutline(
@@ -134,7 +138,7 @@ private fun acceptWatchMessage(issueTitle: String, projectKey: String): ChatMess
         section {
             text(
                 size = MessageTextSize.REGULAR,
-                content = "Successfully registered issue \"$issueTitle\" in project \"$projectKey\""
+                content = "Successfully registered to watch $issueDefaultName for $watchTime days."
             )
         }
     }
