@@ -34,12 +34,12 @@ suspend fun runWatchCommand(
 
         try {
 
-            sendMessage(ChatMessage.Text("Checking registered issues' status..."))
-            checkRegisteredIssueStatus(
-                sendMessage = sendMessage,
-                clientId = payload.clientId
-            )
-            return
+                checkRegisteredIssueStatus(
+                    sendMessage = sendMessage,
+                    clientId = payload.clientId,
+                    issuerId = payload.userId,
+                )
+                return
 
         } catch (e: Exception) {
 
@@ -166,12 +166,13 @@ private class WatchArgs(
 
 private suspend fun checkRegisteredIssueStatus(
     clientId: String,
+    issuerId: String,
     sendMessage: KSuspendFunction1<ChatMessage, Unit>
 ) {
 
     val unresolvedIssues = transaction {
         IssueRegistry
-            .select { IssueRegistry.clientId.eq(clientId) }
+            .select { (IssueRegistry.clientId.eq(clientId)) and (IssueRegistry.issuerId.eq(issuerId)) }
             .toList()
     }
 
@@ -180,24 +181,16 @@ private suspend fun checkRegisteredIssueStatus(
         return
     }
 
-    unresolvedIssues.forEach {
+    val responseMap = unresolvedIssues.map {
 
-            unresolvedIssue ->
+            issue ->
 
-        val spaceInstance = transaction {
-            AppInstallation
-                .select { AppInstallation.clientId.eq(unresolvedIssue[IssueRegistry.clientId]) }
-                .map {
-                    SpaceAppInstance(
-                        it[AppInstallation.clientId],
-                        it[AppInstallation.clientSecret],
-                        it[AppInstallation.serverUrl],
-                    )
-                }
-                .first()
-        }
+        WatchCheckResponseProperties(
+            issueKey = issue[IssueRegistry.issueKey],
+            expectedDateToBeResolved = issue[IssueRegistry.expectedDateToBeResolved]
+        )
 
-        val spaceClient = createSpaceClientFromAppInstance(spaceInstance)
+    }
 
         spaceClient.sendMessage(
             unresolvedIssue[IssueRegistry.issuerId],
