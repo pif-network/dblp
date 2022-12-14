@@ -6,6 +6,7 @@ import space.jetbrains.api.ExperimentalSpaceSdkApi
 import space.jetbrains.api.runtime.helpers.ProcessingScope
 import space.jetbrains.api.runtime.resources.applications
 import space.jetbrains.api.runtime.types.ApplicationIdentifier
+import space.jetbrains.api.runtime.types.ChatBotUiExtensionIn
 import space.jetbrains.api.runtime.types.CustomGenericSubscriptionIn
 import space.jetbrains.api.runtime.types.GlobalPermissionContextIdentifier
 
@@ -50,5 +51,9 @@ suspend fun ProcessingScope.requestPermissions() {
         contextIdentifier = GlobalPermissionContextIdentifier,
         /** @see [SPACE-17854](https://youtrack.jetbrains.com/issue/SPACE-17854/Space-SDK-Cannot-access-fields-that-share-permission) **/
         listOf("Project.Issues.View", "Project.View")
+    )
+    spaceClient.applications.setUiExtensions(
+        contextIdentifier = GlobalPermissionContextIdentifier,
+        extensions = listOf(ChatBotUiExtensionIn)
     )
 }
