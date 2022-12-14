@@ -115,7 +115,7 @@ This is an example of how to list things you need to use the software and how to
 
 - Copy the issue's link and watch it for `x` day(s).
 ```bash
-watch $issue_link $x
+watch register $issue_link $x
 ```
 - Check current watching issues
 ```bash

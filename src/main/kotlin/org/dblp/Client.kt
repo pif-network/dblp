@@ -30,12 +30,3 @@ fun getAppInstanceFromClientId(clientId: String): SpaceAppInstance? {
             .firstOrNull()
     }
 }
-
-fun getWatchersUserId(issueId: String, clientId: String): List<String> {
-    return transaction {
-        IssueRegistry
-            .select { IssueRegistry.issueId.eq(issueId) }
-            .andWhere { IssueRegistry.clientId.eq(clientId) }
-            .map { it[IssueRegistry.issuerId] }
-    }
-}
