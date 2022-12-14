@@ -83,6 +83,20 @@ suspend fun runWatchCommand(
 
                 }
 
+                val registeredIssueOrNull = transaction {
+                    IssueRegistry.select {
+                        (IssueRegistry.clientId.eq(payload.clientId)) and
+                                (IssueRegistry.issuerId.eq(payload.userId))
+                    }.firstOrNull()
+                }
+
+                if (registeredIssueOrNull != null) {
+
+                    sendMessage(ChatMessage.Text(":bangbang: Error: The issue ${theIssue.channel.contact.defaultName} has been registered before."))
+                    return
+
+                }
+
                 transaction {
                     with(IssueRegistry) {
                         replace {
