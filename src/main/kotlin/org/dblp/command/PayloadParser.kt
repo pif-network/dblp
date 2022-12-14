@@ -5,7 +5,7 @@ import space.jetbrains.api.runtime.types.MessagePayload
 import space.jetbrains.api.runtime.types.UnfurlAttachment
 import space.jetbrains.api.runtime.types.UnfurlDetailsIssue
 
-fun payloadParser(payload: MessagePayload, numberOfArguments: Int = 2): WatchArguments? {
+fun payloadParser(payload: MessagePayload, maximumNumberOfArguments: Int = 3): WatchArguments? {
 
     val argumentString = payload.commandArguments() ?: return null
     val argumentList = argumentString.trimEnd().split(" ")
@@ -14,7 +14,7 @@ fun payloadParser(payload: MessagePayload, numberOfArguments: Int = 2): WatchArg
      * [MessagePayload.commandArguments] has already handled the case of empty string,
      * so `argumentList` will always have at least one element.
      */
-    if (argumentList.size !in 1..numberOfArguments) {
+    if (argumentList.size !in 1..maximumNumberOfArguments) {
         return null
     }
 
