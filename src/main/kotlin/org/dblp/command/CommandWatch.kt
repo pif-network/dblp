@@ -123,7 +123,7 @@ private fun acceptWatchMessage(issueDefaultName: String, watchTime: Long): ChatM
         section {
             text(
                 size = MessageTextSize.REGULAR,
-                content = "Successfully registered to watch $issueDefaultName for $watchTime days."
+                content = "Successfully registered to watch $issueDefaultName for $watchTime ${if (watchTime > 1) "days" else "day"}."
             )
         }
     }
