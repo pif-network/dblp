@@ -82,14 +82,14 @@ suspend fun checkRegisteredIssueStatus() {
 
         spaceClient.sendMessage(
             unresolvedIssue[IssueRegistry.issuerId],
-            notifyUnresolvedIssueMessage(unresolvedIssue[IssueRegistry.issueTitle])
+            notifyUnresolvedIssueMessage(unresolvedIssue[IssueRegistry.issueKey])
         )
 
     }
 
 }
 
-private fun notifyUnresolvedIssueMessage(issueTitle: String): ChatMessage {
+private fun notifyUnresolvedIssueMessage(issueKey: String): ChatMessage {
     return message {
         outline(
             MessageOutline(
@@ -98,7 +98,7 @@ private fun notifyUnresolvedIssueMessage(issueTitle: String): ChatMessage {
             )
         )
         section {
-            text("Issue \"$issueTitle\" is still unresolved")
+            text("Issue $issueKey is still unresolved")
         }
     }
 }
