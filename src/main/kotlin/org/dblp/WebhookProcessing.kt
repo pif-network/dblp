@@ -48,7 +48,7 @@ suspend fun ProcessingScope.processWebhookEvent(payload: WebhookRequestPayload) 
                         client.sendMessage(
                             theIssue[IssueRegistry.issuerId],
                             ChatMessage.Text(
-                                "Issue \"${theIssue[IssueRegistry.issueTitle]}\" has been resolved. Removing it from watch list."
+                                "Issue ${theIssue[IssueRegistry.issueKey]} has been resolved. Removing it from the watch list."
                             )
                         )
 
@@ -58,7 +58,7 @@ suspend fun ProcessingScope.processWebhookEvent(payload: WebhookRequestPayload) 
                         IssueRegistry.deleteWhere { IssueRegistry.issueId.eq(event.issue.id) }
                     }
 
-                } 
+                }
 
             }
 

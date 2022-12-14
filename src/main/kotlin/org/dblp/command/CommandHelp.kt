@@ -7,10 +7,10 @@ import space.jetbrains.api.runtime.types.MessageTextSize
 import kotlin.reflect.KSuspendFunction1
 
 suspend fun runHelpCommand(sendMessage: KSuspendFunction1<ChatMessage, Unit>) {
-    sendMessage(helpMessage())
+    sendMessage(messageHelp())
 }
 
-fun helpMessage(): ChatMessage {
+fun messageHelp(): ChatMessage {
     return message {
         section {
             text("**List of available commands**", MessageStyle.PRIMARY, size = MessageTextSize.LARGE)
@@ -20,7 +20,7 @@ fun helpMessage(): ChatMessage {
                 }
             }
             text(
-                "E.g., send `watch https://<your-org>.jetbrains.space/p/<project_key>/issues/<issue_number> 7` to watch that issue for a week.",
+                "E.g., send `watch register https://<your-org>.jetbrains.space/p/<project_key>/issues/<issue_number> 7` to watch that issue for a week.",
                 MessageStyle.PRIMARY,
                 size = MessageTextSize.SMALL
             )
@@ -28,7 +28,7 @@ fun helpMessage(): ChatMessage {
     }
 }
 
-fun helpMessageError(): ChatMessage {
+fun messageErrorHelp(): ChatMessage {
     return message {
         section {
             text("**:exclamation: Unable to process command**", MessageStyle.ERROR, MessageTextSize.LARGE)

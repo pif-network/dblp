@@ -6,9 +6,10 @@ import org.jetbrains.exposed.sql.replace
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
 import space.jetbrains.api.runtime.SpaceClient
-import space.jetbrains.api.runtime.helpers.message
 import space.jetbrains.api.runtime.resources.projects
-import space.jetbrains.api.runtime.types.*
+import space.jetbrains.api.runtime.types.ChatMessage
+import space.jetbrains.api.runtime.types.MessagePayload
+import space.jetbrains.api.runtime.types.ProjectIdentifier
 import java.time.LocalDate
 import kotlin.reflect.KSuspendFunction1
 
@@ -19,7 +20,7 @@ suspend fun runWatchCommand(
 ) {
 
     val arguments = payloadParser(payload) ?: run {
-        sendMessage(helpMessageError())
+        sendMessage(messageErrorHelp())
         return
     }
 
@@ -38,14 +39,7 @@ suspend fun runWatchCommand(
 
             } catch (e: Exception) {
 
-                sendMessage(message {
-                    section {
-                        text(
-                            ":exclamation: Unable to check for registers issues. Please try again later.",
-                            MessageStyle.ERROR
-                        )
-                    }
-                })
+                sendMessage(messageErrorWatchCheck())
                 return
 
             }
@@ -78,7 +72,7 @@ suspend fun runWatchCommand(
 
                 if (theIssue.status.name == "Done") {
 
-                    sendMessage(ChatMessage.Text("The issue ${theIssue.channel.contact.defaultName} is already closed. No need to watch it."))
+                    sendMessage(messageErrorWatchRegisterAResolvedIssue(theIssue.channel.contact.defaultName))
                     return
 
                 }
@@ -92,7 +86,7 @@ suspend fun runWatchCommand(
 
                 if (registeredIssueOrNull != null) {
 
-                    sendMessage(ChatMessage.Text(":bangbang: Error: The issue ${theIssue.channel.contact.defaultName} has been registered before."))
+                    sendMessage(messageErrorWatchRegisterAResolvedIssue(theIssue.channel.contact.defaultName))
                     return
 
                 }
@@ -111,7 +105,7 @@ suspend fun runWatchCommand(
                     }
                 }
 
-                sendMessage(acceptWatchMessage(theIssue.channel.contact.defaultName, time))
+                sendMessage(messageAcceptWatchRegister(theIssue.channel.contact.defaultName, time))
 
             } catch (e: Exception) {
 
@@ -123,23 +117,6 @@ suspend fun runWatchCommand(
 
     }
 
-}
-
-private fun acceptWatchMessage(issueDefaultName: String, watchTime: Long): ChatMessage {
-    return message {
-        outline(
-            MessageOutline(
-                icon = ApiIcon("checkbox-checked"),
-                text = "Watch registration accepted"
-            )
-        )
-        section {
-            text(
-                size = MessageTextSize.REGULAR,
-                content = "Successfully registered to watch $issueDefaultName for $watchTime ${if (watchTime > 1) "days" else "day"}."
-            )
-        }
-    }
 }
 
 private suspend fun checkRegisteredIssueStatus(
@@ -170,25 +147,6 @@ private suspend fun checkRegisteredIssueStatus(
 
     }
 
-    sendMessage(
-        message {
-            section {
-                text(
-                    size = MessageTextSize.LARGE,
-                    content = "The following issues are registered and expected to be resolved soon.*"
-                )
-                fields {
-                    field("**Issue**", "**Day(s) left**")
-                    responseMap.forEach {
-                        field(it.issueKey, it.daysLeft)
-                    }
-                }
-                text(
-                    "*[*] Unresolved outdated issues will be removed from the watch list now.*",
-                    size = MessageTextSize.SMALL
-                )
-            }
-        }
-    )
+    sendMessage(messageResponseWatchCheck(responseMap))
 
 }
