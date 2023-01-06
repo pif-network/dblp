@@ -86,7 +86,7 @@ suspend fun runWatchCommand(
 
                 if (registeredIssueOrNull != null) {
 
-                    sendMessage(messageErrorWatchRegisterAResolvedIssue(theIssue.channel.contact.defaultName))
+                    sendMessage(messageErrorWatchRegisterReRegisteringIssue(theIssue.channel.contact.defaultName))
                     return
 
                 }
