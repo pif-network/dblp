@@ -42,6 +42,23 @@ fun messageResponseWatchCheck(responseList: List<WatchCheckResponseProperties>):
 
 }
 
+fun messageResponseWatchDelete(issueKey: String): ChatMessage {
+    return message {
+        outline(
+            MessageOutline(
+                icon = ApiIcon("checkbox-checked"),
+                text = "Deletion succeeded."
+            )
+        )
+        section {
+            text(
+                size = MessageTextSize.REGULAR,
+                content = "Successfully deleted issue $issueKey."
+            )
+        }
+    }
+}
+
 fun messageErrorWatchCheck(): ChatMessage {
     return message {
         section {
@@ -59,4 +76,15 @@ fun messageErrorWatchRegisterAResolvedIssue(defaultName: String): ChatMessage {
 
 fun messageErrorWatchRegisterReRegisteringIssue(defaultName: String): ChatMessage {
     return ChatMessage.Text(":bangbang: Error: The issue $defaultName has been registered before.")
+}
+
+fun messageErrorWatchDelete(issueKey: String): ChatMessage {
+    return message {
+        section {
+            text(
+                ":exclamation: Unable to delete issue $issueKey. Please try again later.",
+                MessageStyle.ERROR
+            )
+        }
+    }
 }
