@@ -11,20 +11,20 @@ import org.dblp.db.initDbConnection
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
-@OptIn(DelicateCoroutinesApi::class)
 fun main() {
-
-    GlobalScope.launch {
-
-        cronDailyIssueStatusCheck()
-
-    }
 
     embeddedServer(Netty, port = 8080, watchPaths = listOf("classes"), module = Application::module).start(wait = true)
 
 }
 
+@OptIn(DelicateCoroutinesApi::class)
 fun Application.module() {
+
+    launch(newSingleThreadContext("[CRON] Daily-IssueStatusCheck")) {
+
+        cronDailyIssueStatusCheck()
+
+    }
 
     install(DoubleReceive)
 
