@@ -2,6 +2,7 @@ package org.dblp.command
 
 import org.dblp.db.IssueRegistry
 import org.jetbrains.exposed.sql.and
+import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.replace
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -110,6 +111,30 @@ suspend fun runWatchCommand(
             } catch (e: Exception) {
 
                 sendMessage(ChatMessage.Text("Error: ${e.message}"))
+
+            }
+
+        }
+
+        is WatchDeleteArguments -> {
+
+            try {
+
+                transaction {
+                    with(IssueRegistry) {
+                        deleteWhere {
+                            (clientId.eq(payload.clientId)) and
+                                    (issuerId.eq(payload.userId)) and
+                                    (issueKey.eq(arguments.issueKey))
+                        }
+                    }
+                }
+
+                sendMessage(messageResponseWatchDelete(arguments.issueKey))
+
+            } catch (e: Exception) {
+
+                sendMessage(messageErrorWatchDelete(arguments.issueKey))
 
             }
 

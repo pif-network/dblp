@@ -61,7 +61,8 @@ fun payloadParser(payload: MessagePayload, maximumNumberOfArguments: Int = 3): W
     }
 
     if (commandAction == WatchCommandAction.DELETE.name.lowercase()) {
-        return null
+        if (argumentList.size != WatchCommandAction.DELETE.numberOfArguments) return null
+        return WatchDeleteArguments(issueKey = argumentList[1])
     }
 
     if (commandAction == WatchCommandAction.UPDATE.name.lowercase()) {
