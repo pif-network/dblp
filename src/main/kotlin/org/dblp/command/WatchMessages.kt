@@ -42,6 +42,24 @@ fun messageResponseWatchCheck(responseList: List<WatchCheckResponseProperties>):
 
 }
 
+fun messageResponseWatchUpdate(issueKey: String): ChatMessage {
+    return message {
+        outline(
+            MessageOutline(
+                icon = ApiIcon("checkbox-checked"),
+                text = "Watch update accepted"
+            )
+        )
+        section {
+            text(
+                size = MessageTextSize.REGULAR,
+                style = MessageStyle.SUCCESS,
+                content = "Successfully updated the watch time for $issueKey."
+            )
+        }
+    }
+}
+
 fun messageResponseWatchDelete(issueKey: String): ChatMessage {
     return message {
         outline(
@@ -76,6 +94,17 @@ fun messageErrorWatchRegisterAResolvedIssue(defaultName: String): ChatMessage {
 
 fun messageErrorWatchRegisterReRegisteringIssue(defaultName: String): ChatMessage {
     return ChatMessage.Text(":bangbang: Error: The issue $defaultName has been registered before.")
+}
+
+fun messageErrorWatchUpdateNotRegisteredIssue(issueKey: String): ChatMessage {
+    return message {
+        section {
+            text(
+                ":exclamation: Error: The issue $issueKey is not registered.",
+                MessageStyle.ERROR
+            )
+        }
+    }
 }
 
 fun messageErrorWatchDelete(issueKey: String): ChatMessage {

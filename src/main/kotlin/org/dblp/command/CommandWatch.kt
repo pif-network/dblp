@@ -116,6 +116,38 @@ suspend fun runWatchCommand(
 
         }
 
+        is WatchUpdateArguments -> {
+
+            val issueKey = arguments.issueKey
+            val time = arguments.newTime.toLong()
+
+            val registeredIssueOrNull = transaction {
+                IssueRegistry.select {
+                    (IssueRegistry.clientId.eq(payload.clientId)) and
+                            (IssueRegistry.issuerId.eq(payload.userId)) and
+                            (IssueRegistry.issueKey.eq(issueKey))
+                }.firstOrNull()
+            }
+
+            if (registeredIssueOrNull == null) {
+
+                sendMessage(messageErrorWatchUpdateNotRegisteredIssue(issueKey))
+                return
+
+            }
+
+            transaction {
+                with(IssueRegistry) {
+                    replace {
+                        it[expectedDateToBeResolved] = LocalDate.now().plusDays(time)
+                    }
+                }
+            }
+
+            sendMessage(messageResponseWatchUpdate(issueKey))
+
+        }
+
         is WatchDeleteArguments -> {
 
             try {

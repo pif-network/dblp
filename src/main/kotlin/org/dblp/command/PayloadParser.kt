@@ -66,7 +66,8 @@ fun payloadParser(payload: MessagePayload, maximumNumberOfArguments: Int = 3): W
     }
 
     if (commandAction == WatchCommandAction.UPDATE.name.lowercase()) {
-        return null
+        if (argumentList.size != WatchCommandAction.UPDATE.numberOfArguments) return null
+        return WatchUpdateArguments(issueKey = argumentList[1], newTime = argumentList[2])
     }
 
     return null
