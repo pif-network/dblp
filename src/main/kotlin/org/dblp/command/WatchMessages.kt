@@ -7,13 +7,12 @@ fun messageAcceptWatchRegister(issueDefaultName: String, watchTime: Long): ChatM
     return message {
         outline(
             MessageOutline(
-                icon = ApiIcon("checkbox-checked"),
-                text = "Watch registration accepted"
+                icon = null,
+                text = ":white_check_mark:Watch registration accepted"
             )
         )
         section {
             text(
-                size = MessageTextSize.REGULAR,
                 content = "Successfully registered to watch $issueDefaultName for $watchTime ${if (watchTime > 1) "days" else "day"}."
             )
         }
